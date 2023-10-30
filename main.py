@@ -6,11 +6,7 @@ from cities import Map
 
 if __name__ == '__main__':
 
-    map = Map(200, 200, 10,15)
-    map.connect_cities()
-    map.draw_map()
-
-    # for i in range(4):
-    #
-    #     map.connect_cities()
-    #     map.draw_map()
+    # Map size x, Map size Y, Number of Cities, Minimal distance between cities
+    map = Map(200, 200, 20,10)
+    map.start_evolution()
+    map.draw_generations()

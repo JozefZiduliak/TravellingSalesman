@@ -1,25 +1,34 @@
 import random
 import matplotlib.pyplot as plt
 from geneticAlgorithm import GeneticAlgorithm
+from geneticAlgorithm import Agent
+
+# Represents city in 2d space
 class City:
 
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.connected_city = None
+        self.connected_city = None # Is used to print roads between cities
 
 
+# Class that creates map and draws it
 class Map:
 
     def __init__(self, x_size, y_size, number_of_cities,min_distance):
-        self.my_x_size = x_size
-        self.my_y_size = y_size
+        self.my_x_size = x_size # X size of map
+        self.my_y_size = y_size # Y size of map
         self.my_number_of_cities = number_of_cities
-        self.my_cities = []
-        self.my_map = []
-        self.min_distance = min_distance
+        self.my_cities = [] # Coordinates of cities in list
+        self.my_map = [] # 2d list. Cities are represented with 1 and empty space by 0
+        self.min_distance = min_distance # Minimal distance between cities
         self.__create_map()
-        self.genetic_algorithm = GeneticAlgorithm(self.my_cities)
+        self.number_of_agents_in_generation = 20
+        self.genetic_algorithm = GeneticAlgorithm(self.my_cities, self.number_of_agents_in_generation)
+        self.current_generation = 0 # Number of current generation
+        self.generations = None #List of generations. Every element represents one generation of agents
+
+
 
     def __create_map(self):
         # sets all items in 2d list to 0
@@ -51,19 +60,40 @@ class Map:
     def __distance(self, city1, city2):
         return ((city1.x - city2.x) ** 2 + (city1.y - city2.y) ** 2) ** 0.5
 
-    def connect_cities(self):
 
-        # Connects each city to the city that follows it in the list
-        # for i in range(len(self.my_cities) - 1):
-        #     self.my_cities[i].connected_city = self.my_cities[i + 1]
-        # # The last city is connected to the first to close the loop
-        #     self.my_cities[-1].connected_city = self.my_cities[0]
-        self.my_cities = self.genetic_algorithm.connect_cities()
+    # Starts the evolution process in GeneticAlgorithm Class
+    def start_evolution(self):
+        self.generations = self.genetic_algorithm.create_generation()
+
+
+    # Connects cities based on permutation in given agent
+    def connect_cities(self, agent):
+        number_of_cities = len(self.my_cities)
+        for i in range(number_of_cities):
+
+            if i != number_of_cities -1:
+                self.my_cities[agent.permutation[i]].connected_city = self.my_cities[agent.permutation[i + 1]]
+            else:
+                self.my_cities[agent.permutation[i]].connected_city = self.my_cities[agent.permutation[0]]
+
+    def draw_generations(self):
+        # Change the generation number based on generation later
+        generation = self.generations[0]
+
+        for i in range(self.number_of_agents_in_generation):
+            current_agent = generation[i]
+
+            self.connect_cities(current_agent)
+            self.draw_map()
+
+            print(f"{current_agent.permutation}")
+            print(f"Fitness: {current_agent.fitness}")
 
 
 
 
     def draw_map(self, route=None):
+        # Draw cities as blue circles
         x, y = zip(*[(city.x, city.y) for city in self.my_cities])
         plt.figure(figsize=(8, 6))
         plt.scatter(x, y, c='b', marker='o', label='Cities')
@@ -77,4 +107,10 @@ class Map:
         plt.gca().set_aspect('equal')
         plt.legend()
         plt.title("Map of Cities with Connections")
+
+        # Draws the number of generation
+        plt.annotate(f'Generation: {self.current_generation}', xy=(0, 0), xycoords='axes fraction',
+                     xytext=(-20, -40), textcoords='offset points',
+                     horizontalalignment='left', verticalalignment='bottom')
+
         plt.show()
