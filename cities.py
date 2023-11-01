@@ -23,10 +23,11 @@ class Map:
         self.my_map = [] # 2d list. Cities are represented with 1 and empty space by 0
         self.min_distance = min_distance # Minimal distance between cities
         self.__create_map()
-        self.number_of_agents_in_generation = 20
-        self.genetic_algorithm = GeneticAlgorithm(self.my_cities, self.number_of_agents_in_generation)
+        # self.number_of_agents_in_generation = 20
+        # self.number_of_generations = 10
+        self.genetic_algorithm = GeneticAlgorithm(self.my_cities)
         self.current_generation = 0 # Number of current generation
-        self.generations = None #List of generations. Every element represents one generation of agents
+        self.best_agents = None # List of best agent every 50th generations
 
 
 
@@ -63,7 +64,17 @@ class Map:
 
     # Starts the evolution process in GeneticAlgorithm Class
     def start_evolution(self):
-        self.generations = self.genetic_algorithm.create_generation()
+        self.best_agents = self.genetic_algorithm.start_evolution()
+
+        #number_of_agents = len(self.best_agents)
+        #print(f"Number of agents: {number_of_agents}")
+        # Print permutation in each agent
+        #print("Cities class")
+        #for agent in self.best_agents:
+           # print(agent.permutation)
+            #print(agent.fitness)
+
+        self.draw_generations()
 
 
     # Connects cities based on permutation in given agent
@@ -78,16 +89,22 @@ class Map:
 
     def draw_generations(self):
         # Change the generation number based on generation later
-        generation = self.generations[0]
+        #generation = self.generations[0]
 
-        for i in range(self.number_of_agents_in_generation):
-            current_agent = generation[i]
+        #print("--------------------------------------------------")
+
+        number_of_best_agents = len(self.best_agents)
+
+        for i in range(number_of_best_agents):
+            #current_agent = generation[i]
+            current_agent = self.best_agents[i]
 
             self.connect_cities(current_agent)
             self.draw_map()
 
-            print(f"{current_agent.permutation}")
-            print(f"Fitness: {current_agent.fitness}")
+            #print(f"{current_agent.permutation}")
+            #print(f"Fitness: {current_agent.fitness}")
+            #print("--------------------------------------------------")
 
 
 
