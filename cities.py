@@ -91,13 +91,19 @@ class Map:
         # Change the generation number based on generation later
         #generation = self.generations[0]
 
-        #print("--------------------------------------------------")
+        print("--------------------------------------------------")
 
         number_of_best_agents = len(self.best_agents)
+
+        print(f"Number of best agents: {number_of_best_agents}")
+
 
         for i in range(number_of_best_agents):
             #current_agent = generation[i]
             current_agent = self.best_agents[i]
+
+            print(f"Agent number: {i}")
+
 
             self.connect_cities(current_agent)
             self.draw_map()
