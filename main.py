@@ -10,3 +10,4 @@ if __name__ == '__main__':
     map = Map(200, 200, 40,20)
     map.start_evolution()
     #map.draw_generations()
+

@@ -75,6 +75,7 @@ class Map:
             #print(agent.fitness)
 
         self.draw_generations()
+        self.plot_average_fitness()
 
 
     # Connects cities based on permutation in given agent
@@ -112,8 +113,18 @@ class Map:
             #print(f"Fitness: {current_agent.fitness}")
             #print("--------------------------------------------------")
 
+    def plot_average_fitness(self):
+
+        average_fitness_values = self.genetic_algorithm.get_average_fitness()
 
 
+        plt.figure(figsize=(10, 5))
+        plt.plot(average_fitness_values, marker='o', linestyle='-', color='b')
+        plt.title('Average Fitness per Generation')
+        plt.xlabel('Generation')
+        plt.ylabel('Average Fitness')
+        plt.grid(True)
+        plt.show()
 
     def draw_map(self, route=None):
         # Draw cities as blue circles
