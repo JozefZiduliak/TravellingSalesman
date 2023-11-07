@@ -20,16 +20,16 @@ class GeneticAlgorithm:
 
         # Parameters for Genetic Algorithm
         self.number_of_agents_in_generation = 500
-        self.number_of_generations = 300
-        self.save_every_x_generation = 60
-        self.fresh_blood_probability = 10
-        self.mutation_chance = 10
+        self.number_of_generations = 500
+        self.save_every_x_generation = 150
+        self.fresh_blood_probability = 5
+        self.mutation_chance = 5
         self.is_tournaments = False # If this is false, then the roulette will run
         self.simple_mutation_on = False
         # Add choice for
-        self.elitism_on = False
-        self.elite_number = 0
-
+        self.elitism_on = True
+        self.elite_number = 5
+        self.single_point_crossover = False
 
     def __create_permutation(self):
         permutation = []
@@ -136,8 +136,8 @@ class GeneticAlgorithm:
                 self.generation = combined_generation[:self.number_of_agents_in_generation]
 
 
-                if generation_number % self.save_every_x_generation == 0:
-
+                #if generation_number % self.save_every_x_generation == 0:
+                if generation_number == self.number_of_generations:
                     self.best_agent_from_generation.append(self.find_best_agent(self.generation))
 
                 # Calculate average fitness of the generation
@@ -245,8 +245,6 @@ class GeneticAlgorithm:
 
 
         for i in range(0, int(self.number_of_agents_in_generation / 2), 2):
-        #for i in range(0, int(self.number_of_agents_in_generation), 2):
-
             if random.randint(1, 100) <= self.fresh_blood_probability:
                 # Generate a new random permutation
                 permutation = self.__create_permutation()
@@ -254,13 +252,19 @@ class GeneticAlgorithm:
                 new_parent = Agent(parent_generation, permutation, 0)
                 new_parent.fitness = self.agent_fitness(new_parent)
                 parent2 = new_parent
+                parent1 = parents[i]
 
-            parent1 = parents[i]
-            parent2 = parents[i+1]
+            else:
+                parent1 = parents[i]
+                parent2 = parents[i+1]
 
             # Parent generation
-            next_generation.append(self.create_children_two_point(parent1, parent2, parent_generation))
-            next_generation.append(self.create_children_two_point(parent2, parent1, parent_generation))
+            if not self.single_point_crossover:
+                next_generation.append(self.create_children_two_point(parent1, parent2, parent_generation))
+                next_generation.append(self.create_children_two_point(parent2, parent1, parent_generation))
+            else:
+                next_generation.append(self.create_child(parent1, parent2, parent_generation))
+                next_generation.append(self.create_child(parent2, parent1, parent_generation))
 
         #self.generation = next_generation
         return next_generation
@@ -380,7 +384,22 @@ class GeneticAlgorithm:
         for i in range(0, first_divide_point):
             child_permutation[i] = permutation_2_mixed[i + len(child_permutation) - second_divide_point]
 
+
+
+        # Mutate the child
+        if random.randint(1, 100) <= self.mutation_chance:
+            # Generate two random indexes
+            if self.simple_mutation_on:
+                index1 = random.randint(0, len(child_permutation) - 1)
+                index2 = random.randint(0, len(child_permutation) - 1)
+
+                # Swap the values at the generated indexes
+                child_permutation[index1], child_permutation[index2] = child_permutation[index2], child_permutation[index1]
+            else:
+                child_permutation = self.complex_mutation(child_permutation)
+
         new_child = Agent(parent_generation, child_permutation, 0)
+
         new_child.fitness = self.agent_fitness(new_child)
         return new_child
 
